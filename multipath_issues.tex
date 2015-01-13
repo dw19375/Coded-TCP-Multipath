@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage{url}
+\begin{document}
+\section{Network Topology}
+Consider a server node, $S$, which wants to transmit data to a client node, $C$, via multiple paths.  The server can transmit on multiple lossy links through different gateways, and the client receives packets, possibly through an intermediate node, $I$.
+
+\section{Acquiring and Sending on Multiple Paths}
+In order to send data on multiple paths, multiple paths must be established on the server side, and the server must be able to control on which paths it sends data.  This can be accomplished in one of two ways.
+
+\begin{enumerate}
+\item
+Setup a UDP socket and bind to a specific
+IP address. Messages are then sent using
+'sendto'.
+
+When executing the program,
+you need to make sure that the routing 
+tables are setup appropriately.  This 
+should be done similarly to what was 
+done at: 
+
+\url{multipath-tcp.org/pmwiki.php/Users/ConfigureRouting}
+
+\item
+Setup a UDP socket and bind to a specific
+IP address. To send a message, you will
+to use 'sendmsg' with the appropriate 
+command headers.  The code below provides
+an example.  It appears that there is no 
+need to modify routing tables or anything
+else on the system to run this program.
+\end{enumerate}
+%
+The second option will be used, since it does not require administrative privileges and can be done dynamically.
+
+When a gateway is acquired, it should be verified that it is to a different network than existing gateways.
+
+\section{Congestion Control}
+The goal is to ensure fairness among all network users and reduce total network congestion. 
+Congestion control should be done on a per-path basis.  In the event of congestion on one path, data flow on that path must be reduced.  Since each individual path from the server will try to maximize its own flow, the congested path cannot ``transfer'' any of its flow to another path.
+
+\subsection{Fairness}
+In some cases, this may lead to scenarios where flows from $S$ ``crowd out'' other flows in the network.  Consider a network with two flows from $S$ to $I_1$ along separate paths, and one flow into $I_1$ from $R$, sharing an outgoing link from $I_1$ to $I_2$.  ($S$ and $R$ are server nodes, and $I_1$ and $I_2$ are intermediate nodes.)  If the link $I_1I_2$ has a lower throughput than the paths from $S$ and $R$, then $2/3$ of the flow will be allocated to $S$, while only $1/3$ will be allocated to $R$.  
+
+We assume that the above example is unlikely to occur, and that the multiple paths from $S$ to $I_1$ are of a poor quality compared to the rest of the network.
+
+\section{Packet Allocation among Multiple Paths}
+A simple packet allocation scheme would simply send a packet at the head of the queue on the first available path.  Paths could then be ordered according to some metric of ``goodness'', which would be application dependent.  Under this scheme, coded packets and uncoded packets are treated the same.
+
+Another allocation technique would send coded packets on different links than uncoded packets.  How this should be done, and whether this should be done depends on the link characteristics and application.
+
+\subsection{Feedback Along Different Paths}
+It is possible to send feedback (e.g., acknowledgments) along a different path than the path to which the feedback pertains.  This could allow the server to respond to network changes faster than it otherwise would, and allow the feedback to be sent along paths with higher reliability. 
+
+
+\section{Changes in Network Topology}
+The network topology may change - new links may appear, and existing links may disappear.  The protocol should be robust to these changes.
+
+\section{Coding}
+Since packet loss probability varies between paths, packets sent on one path may need a different amount of redundancy than packets sent on another path.  Furthermore, coded packets may be sent on paths different than the paths the corresponding information packets were sent on.
+
+\end{document}
