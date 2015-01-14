@@ -27,6 +27,7 @@ Specific milestones for accomplishing the goals above include:
  * Implement 3-way handshakes over UDP
  * Implement congestion control over UDP
  * Ensure that the code allows you to create/destroy a path without destroying the session
+ * Implement end-to-end session capabilities (e.g., sync local/remote proxies, ensure that local client can communicate with remote host, etc.)
  * Test and verification  
 
 ### Sliding window coding, single-path  
