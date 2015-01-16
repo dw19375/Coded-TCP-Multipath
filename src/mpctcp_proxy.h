@@ -14,6 +14,7 @@ typedef struct proxy_config {
 	char local_ip[256];
 	int socks_port;
 	int port_start;
+	int port_end;
 } proxy_config;
 
 #endif
