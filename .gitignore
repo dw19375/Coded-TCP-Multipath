@@ -34,3 +34,7 @@
 # aux and log files produced by LaTeX
 *.aux
 *.log
+
+.buildmode
+mpctcp_proxy
+
