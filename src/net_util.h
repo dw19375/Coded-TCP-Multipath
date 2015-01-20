@@ -1,3 +1,9 @@
+/*
+ * net_util.h 
+ * 
+ * Contains various network related utilities.
+ */
+
 #ifndef NET_UTIL_H
 #define NET_UTIL_H
 
@@ -8,14 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
-typedef int bool;
 typedef int socket_t;
-typedef struct timeval timeval_t;
-
-#define TRUE 1
-#define FALSE 0
-#define MIN(x,y) (y)^(((x) ^ (y)) &  - ((x) < (y)))
-#define MAX(x,y) (y)^(((x) ^ (y)) & - ((x) > (y)))
 
 #define NETIFDOWN	0
 #define NETIFUP		1
@@ -77,25 +76,10 @@ typedef struct{
 
 
 /* Function declarations */
-double getTime(void);
-Data_Pckt* dataPacket(uint32_t seqno, uint32_t blockno, uint8_t num_packets);
-Skb* ackPacket(uint32_t ackno, uint32_t blockno, uint8_t dofs_left, int debug);
 void htonpData(Data_Pckt *msg);
 void htonpAck(Ack_Pckt *msg);
 void ntohpData(Data_Pckt *msg);
 void ntohpAck(Ack_Pckt *msg);
 void prettyPrint(char** coeffs, int window);
-uint8_t FFmult(uint8_t x, uint8_t y);
-uint8_t xFFlog(uint8_t x);
-uint8_t fastFFmult(uint8_t x, uint8_t logy);
-void seedfastrand(uint32_t seed);
-uint32_t fastrand();
-
-#ifdef __MACH__
-#include <sys/time.h>
-#endif
-//portable clock_gettime 
-#define CLOCK_REALTIME  0 // dummy constant
-int clock_gettime(int dummy, struct timespec* t);
 
 #endif
