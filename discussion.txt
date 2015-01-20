@@ -1,0 +1,4 @@
+Discussion
+
+Jason, do you need me to handle the three way handshake, or is the lower layer SOCKS going to do that?
+
