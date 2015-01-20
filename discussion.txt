@@ -1,4 +1,5 @@
 Discussion
 
-Jason, do you need me to handle the three way handshake, or is the lower layer SOCKS going to do that?
+1. Jason, do you need me to handle the three way handshake, or is the lower layer SOCKS going to do that?
 
+	Let's not worry about that right now and just focus on getting something easy working (e.g., getting UDP packets generated and sent).  Once we get that done, we can put in all of the reliability stuff. Before we work on the handshake between the proxy_remote and proxy_local, I think we need to sit down and think about all of the information that they need to exchange.  I'll have a better idea of the SOCKS related stuff in a few days, but I need to think about the coding and multipath stuff.
