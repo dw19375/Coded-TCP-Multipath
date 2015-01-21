@@ -16,6 +16,7 @@
 #ifdef __MACH__
 #include <sys/time.h>
 #endif
+#include "default_config.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -24,6 +25,7 @@ typedef int bool;
 typedef struct timeval timeval_t;
 
 /* Function declarations */
+void print_help(proxy_config *);
 double getTime(void);
 
 

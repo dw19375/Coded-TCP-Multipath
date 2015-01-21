@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 		switch (c) 
 		{
 			case 'h':  //Print help
-				print_help();
+				print_help(&proxy_cfg);
 				exit(EXIT_SUCCESS);
 			case 'v':  //Print Version
 				printf("%s version %s (%s)\n", proxy_cfg.program_name, proxy_cfg.version, proxy_cfg.date);
@@ -29,10 +29,8 @@ int main(int argc, char *argv[])
 			case '?':
 				if (optopt == 'c')
 					fprintf(stderr, "Option -%c requires an arguement.\n", optopt);
-				else if (isprint (optopt))
-					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
 				else
-					fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
 				exit(EXIT_FAILURE);
 			default:
 				exit(EXIT_FAILURE);
