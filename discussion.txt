@@ -1,8 +1,14 @@
 Discussion
 
+3. Dan, before you insert code, please make sure that it compiles.  I have to comment out a lot of stuff in the net_util files in order to get things to work.  In addition, it looks like you may have to rewrite a lot of those functions.  For example, some of them reference “block_size” which we aren’t going to use.
+
+
+
 2. Jason, what compiler are you using?  If you're not using gcc, then we may have to worry about struct packing for packet headers and 32 vs. 64 bit alignment.
 
 Nevermind, I'll use the iovec to read and write structs.
+
+I’m using Apples LLVM 6.0 compiler.  I’ll see if I can switch over to gcc.
 
 1. Jason, do you need me to handle the three way handshake, or is the lower layer SOCKS going to do that?
 

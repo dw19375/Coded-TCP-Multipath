@@ -14,6 +14,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define MAX_CFG_VARS 30
+
 typedef struct proxy_config {
     char program_name[128];
     char version[128];
@@ -26,6 +28,18 @@ typedef struct proxy_config {
     int socks_port;
     int port_start;
     int port_end;
+    int max_connections;
+    int socks_neg_rto;
+    char remote_addr[256];
+    int remote_port;
+    double slr_scaling;
+    char cong_control[16];
+    int debug;
+    int mpctcp_probe;
+    int num_vars;
+    void* var_name[MAX_CFG_VARS];
+    void* var_ptr[MAX_CFG_VARS];
+    char var_type[MAX_CFG_VARS];
 } proxy_config;
 
 proxy_config getconfig();

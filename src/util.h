@@ -26,6 +26,7 @@ typedef struct timeval timeval_t;
 
 /* Function declarations */
 void print_help(proxy_config *);
+int read_config(proxy_config *);
 double getTime(void);
 
 

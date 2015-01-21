@@ -17,7 +17,7 @@
 #include "util.h"
 
 
-void print_help(proxy_config* proxy_cfg)
+void print_help(proxy_config *proxy_cfg)
 {
     printf("\n");
     printf("USAGE:\n\t%s [OPTIONS] ACTION\n",proxy_cfg->program_name);
@@ -33,6 +33,63 @@ void print_help(proxy_config* proxy_cfg)
     printf("\n");
 }
 
+int read_config(proxy_config *proxy_cfg)
+{
+    char *line=NULL;
+    size_t linecap=0;
+    ssize_t linelen;
+    char val[256];
+    char var[256];
+    int i;
+    
+    FILE *f;
+    if ((f=fopen(proxy_cfg->config_file, "r"))==NULL) {
+        fprintf(stderr, "Could not open config file %s\n",proxy_cfg->config_file);
+        return -1;
+    }
+    
+    while ((linelen = getline(&line, &linecap, f)) > 0) {
+        if (linelen > 1) {
+            if (sscanf(line, "#%256s",val))
+                continue;
+            
+            if (!sscanf(line, "%256s = %256s",var,val)) {
+                fprintf(stderr, "Could not parse config file %s\n",proxy_cfg->config_file);
+                return -1;
+            }
+            
+            if ((var[0] && !val[0]) || (!var[0] && val[0])) {
+                fprintf(stderr, "Could not parse config file %s\n",proxy_cfg->config_file);
+                return -1;
+            }
+            
+            if (!var[0] && !val[0])
+                continue;
+            
+            for (i=0; i<proxy_cfg->num_vars; i++) {
+                if (!strcmp(var, proxy_cfg->var_name[i])) {
+                    switch (proxy_cfg->var_type[i]) {
+                        case 's':
+                            strcpy((char*)(proxy_cfg->var_ptr[i]), val);
+                            break;
+                        case 'n':
+                            *(int*)proxy_cfg->var_ptr[i] = atoi(val);
+                            break;
+                        case 'f':
+                            *(double*)proxy_cfg->var_ptr[i] = atof(val);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    
+    free(line);
+    fclose(f);
+    return 0;
+}
 
 /*
  * Returns the current UNIX time in seconds.

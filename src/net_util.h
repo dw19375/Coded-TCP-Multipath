@@ -85,10 +85,11 @@ typedef struct
 
 
 /* Function declarations */
+/*
 void htonpData(Data_Pckt *msg);
 void htonpAck(Ack_Pckt *msg);
 void ntohpData(Data_Pckt *msg);
 void ntohpAck(Ack_Pckt *msg);
 void prettyPrint(char** coeffs, int window);
-
+*/
 #endif

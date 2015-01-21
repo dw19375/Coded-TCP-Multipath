@@ -17,6 +17,8 @@
 #include "net_util.h"
 #include "util.h"
 
+/*  Make sure this compiles
+ 
 void htonpHdr( Pckt_Header* hdr )
 {
   if( NULL != hdr )
@@ -102,4 +104,4 @@ prettyPrint(char** coeffs, int window){
   }
 }
 
-
+*/
