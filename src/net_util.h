@@ -23,6 +23,20 @@ typedef int socket_t;
 // Max IP header is 24B, UDP header is 8B 
 #define IPUDP_HEADER_SIZE 32 
 
+// Flags for Data_Pckt
+// Currently, this is an int32_t, but gcc can use
+// __attribute__ ((__packed__)) to reduce it to one byte.
+// Affects the size/packing of the packet header as well.
+typedef enum 
+{
+  NORMAL=0, 
+  SYN, 
+  SYN_ACK, 
+  FIN, 
+  FIN_ACK, 
+  CODED
+}flag_t;
+
 
 struct addr_list
 {
@@ -33,43 +47,38 @@ struct addr_list
 	int sk;
 };
 
+typedef struct
+{
+  double tstamp;        // Time stamp
+  flag_t flag;          // Flag indicating packet type
+  uint32_t seqno;       // Normal packet - sequence number
+                        // ACK - packet being acknowledged
+                        // Coded - beginning of coding window
+  
+  uint16_t num_packets; // Coded - Number of packets in coding window
+                        // ACK - Number of dofs requested
+                        // Normal Packet - unused
+  
+  uint16_t coeff_seed;  // Seed for coefficients of coded packets
+                        // Used only for coded packets
+} Pckt_Header;
 
-typedef struct{
-  double tstamp;
-  flag_t flag;
-  uint32_t  seqno; // Sequence # of the coded packet sent
-  uint32_t  blockno; // Base of the current block
-  uint8_t start_packet; // The # of the first packet that is mixed
-  uint8_t  num_packets; // The number of packets that are mixed
-  uint8_t packet_coeff; // Seed for coefficients of the mixed packets
-  //  unsigned char checksum[CHECKSUM_SIZE];  // MD5 checksum
-  char payload[PAYLOAD_SIZE];  
+typedef struct
+{
+  Pckt_Header hdr;
+  char* buf;        // Payload - allocate MSS - sizeof(Pckt_Header)
+                    // Don't statically allocate here so we can 
+                    // dynamically set MSS
 } Data_Pckt;
 
-typedef struct{
-  double tstamp;
-  flag_t flag;
-  uint32_t  ackno; // The sequence # that is being acked --> this is to make it Reno-like
-  uint32_t  blockno; // Base of the current block
-  uint8_t dof_rec;  // Number of dofs left from the block
-  //  unsigned char checksum[CHECKSUM_SIZE];  // MD5 checksum
+// All information an ACK needs to carry is in the header
+typedef struct
+{
+  Pckt_Header hdr;
 } Ack_Pckt;
 
-// used for zero copy 
-typedef union {
-  Data_Pckt msg;
-  Ack_Pckt ack;
-  char buff[MSS];
-} Msgbuf;
-
-// used to provide pool of packets for mem management
-typedef struct Skb {
-  Msgbuf msgbuf;
-  struct Skb* next;
-  bool used;
-} Skb;
-
-typedef struct{
+typedef struct
+{
   uint16_t payload_size;
   char* payload;
 } Bare_Pckt; // This is the datastructure for holding packets before encoding
