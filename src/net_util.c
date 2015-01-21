@@ -108,6 +108,7 @@ prettyPrint(char** coeffs, int window){
  * Packs header into unambiguous format to be sent across 
  * the network.  Input data is assumed to be in host byte order
  * and output data is in network byte order.
+ * The Pckt_Header passed in is not clobbered.
  * 
  * Parameters:
  *    buf   - Pointer to buffer to fill.
@@ -142,6 +143,9 @@ int pack_hdr( char* buf, Pckt_Header hdr )
     memcpy( buf + retval, &hdr.seqno , sizeof(uint32_t) );
     retval += sizeof(uint32_t);
     
+    memcpy( buf + retval, &hdr.len , sizeof(uint32_t) );
+    retval += sizeof(uint32_t);
+    
     memcpy( buf + retval, &hdr.num_packets , sizeof(uint16_t) );
     retval += sizeof(uint16_t);
     
@@ -158,12 +162,13 @@ int pack_hdr( char* buf, Pckt_Header hdr )
  * 
  * Unpacks header from network format.  Data is assumed to be in
  * network byte order.
+ * Note: Ensure regions pointed to by hdr and buf do not overlap!
  * 
  * Parameters:
  *    buf   - Pointer to raw header data.
  *    hdr   - Pointer to packet header to fill.
  * 
- * Returns number of bytes read into buf.
+ * Returns number of bytes read from buf.
  */
 int unpack_hdr( char* buf, Pckt_Header* hdr )
 {
@@ -184,6 +189,10 @@ int unpack_hdr( char* buf, Pckt_Header* hdr )
     retval += sizeof(uint32_t);
     buf += retval;
     
+    hdr->len = *((uint32_t*)buf);
+    retval += sizeof(uint32_t);
+    buf += retval;
+    
     hdr->num_packets = *((uint16_t*)buf);
     retval += sizeof(uint16_t);
     buf += retval;
@@ -199,4 +208,65 @@ int unpack_hdr( char* buf, Pckt_Header* hdr )
   return retval;
 }
 
+/*
+ * pack_Data_Pckt
+ * 
+ * Converts a Data_Pckt struct into a stream which can be sent 
+ * on the network.  The header is converted using pack_hdr and all 
+ * fields in the header are in network byte order.  The data in the 
+ * packet is copied sequentially into the buffer.
+ * 
+ * If it so happens that the location where the payload would be
+ * copied happens to be where pkt.buf points 
+ * (i.e. pkt.buf = buf + CTCP_HDR_SIZE ), a memcpy is not performed.
+ * This can be exploited to avoid a lot of unnecessary copying of 
+ * data.
+ * 
+ * Parameters:
+ *    buf  - Buffer to copy into
+ *    pkt  - Data packet to read from.
+ * 
+ * Returns number of bytes copied into buf.
+ */
+int pack_Data_Pckt( char* buf, Data_Pckt pkt )
+{
+  int retval = 0;
+  
+  if( NULL != buf )
+  {
+    retval += pack_hdr( buf, pkt.hdr );
+    buf += retval;
+    
+    if( buf != pkt.buf )
+    {
+      memmove( buf, pkt.buf, pkt.hdr.len );
+    }
+  }
+  
+  return retval;
+}
 
+/*
+ * pack_Ack_Pckt
+ * 
+ * Converts a Ack_Pckt struct into a stream which can be sent 
+ * on the network.  The header is converted using pack_hdr and all 
+ * fields in the header are in network byte order.
+ * 
+ * Parameters:
+ *    buf  - Buffer to copy into
+ *    pkt  - Ack packet to read from.
+ * 
+ * Returns number of bytes copied into buf.
+ */
+int pack_Ack_Pckt( char* buf, Ack_Pckt pkt )
+{
+  int retval = 0;
+  
+  if( NULL != buf )
+  {
+    retval += pack_hdr( buf, pkt.hdr );
+  }
+  
+  return retval;
+}

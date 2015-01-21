@@ -20,7 +20,7 @@ typedef int socket_t;
 #define NETIFUP		1
 
 // CTCP Header size in bytes.
-#define CTCP_HDR_SIZE 20
+#define CTCP_HDR_SIZE 24
 
 // We have to take into account the IP+UDP header
 // Max IP header is 24B, UDP header is 8B 
@@ -61,6 +61,8 @@ typedef struct
   uint32_t seqno;       // Normal packet - sequence number
                         // ACK - packet being acknowledged
                         // Coded - beginning of coding window
+                        
+  uint32_t len;         // Length of payload (excludes header)
   
   uint16_t num_packets; // Coded - Number of packets in coding window
                         // ACK - Number of dofs requested
@@ -99,5 +101,7 @@ void ntohpAck(Ack_Pckt *msg);
 void prettyPrint(char** coeffs, int window);
 int pack_hdr( char* buf, Pckt_Header hdr );
 int unpack_hdr( char* buf, Pckt_Header* hdr );
+int pack_Data_Pckt( char* buf, Data_Pckt pkt );
+int pack_Ack_Pckt( char* buf, Ack_Pckt pkt );
 
 #endif
