@@ -102,7 +102,12 @@ FFmult(uint8_t x, uint8_t y)
 /* random number generation */
 #define rotl(r,n) (((r)<<(n)) | ((r)>>((8*sizeof(r))-(n))))
 
+// We have <stdint.h>
+#ifndef __uint32_t_defined
 typedef unsigned uint32_t;  // or use <stdint.h> if available
+#define __uint32_t_defined
+#endif
+
 uint32_t x, y, z;
 
 void seedfastrand(uint32_t seed) {
