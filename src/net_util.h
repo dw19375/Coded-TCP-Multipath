@@ -19,6 +19,9 @@ typedef int socket_t;
 #define NETIFDOWN	0
 #define NETIFUP		1
 
+// CTCP Header size in bytes.
+#define CTCP_HDR_SIZE 20
+
 // We have to take into account the IP+UDP header
 // Max IP header is 24B, UDP header is 8B 
 #define IPUDP_HEADER_SIZE 32 
@@ -47,6 +50,10 @@ struct addr_list
 	int sk;
 };
 
+/*
+ * Packet header struct.  If you change this, be sure to update
+ * pack_hdr and unpack_hdr functions and CTCP_HDR_SIZE.
+ */
 typedef struct
 {
   double tstamp;        // Time stamp
@@ -66,7 +73,7 @@ typedef struct
 typedef struct
 {
   Pckt_Header hdr;
-  char* buf;        // Payload - allocate MSS - sizeof(Pckt_Header)
+  char* buf;        // Payload - allocate MSS - sizeof(header)
                     // Don't statically allocate here so we can 
                     // dynamically set MSS
 } Data_Pckt;
