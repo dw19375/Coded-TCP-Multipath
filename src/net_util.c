@@ -17,8 +17,6 @@
 #include "net_util.h"
 #include "util.h"
 
-/*  Make sure this compiles
- 
 void htonpHdr( Pckt_Header* hdr )
 {
   if( NULL != hdr )
@@ -50,7 +48,7 @@ htonpData(Data_Pckt* msg)
 {
   if( NULL != msg )
   {
-    htonpHdr( msg->hdr );
+    htonpHdr( &(msg->hdr) );
   }
   // Data is all in bytes, so don't need to do anything
 }
@@ -60,7 +58,7 @@ htonpAck(Ack_Pckt* msg)
 {
   if( NULL != msg )
   {
-    htonpHdr( msg->hdr );
+    htonpHdr( &(msg->hdr) );
   }
 }
 
@@ -69,7 +67,7 @@ ntohpData(Data_Pckt* msg)
 {
   if( NULL != msg )
   {
-    ntohpHdr( msg->hdr );
+    ntohpHdr( &(msg->hdr) );
   }
   // Data is all in bytes, so don't need to do anything
 }
@@ -79,10 +77,14 @@ ntohpAck(Ack_Pckt* msg)
 {
   if( NULL != msg )
   {
-    ntohpHdr( msg->hdr );
+    ntohpHdr( &(msg->hdr) );
   }
 }
 
+/* 
+ * Old Code from Coded-TCP
+ */
+/*
 void
 prettyPrint(char** coeffs, int window){
   int i,j;

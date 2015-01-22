@@ -7,6 +7,8 @@
  * Functions to receive and decode packets.
  */
 
+#include <stdlib.h>
+#include <stdint.h>
 #include "mpctcp_cli.h"
 
 /*
