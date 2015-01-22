@@ -25,8 +25,8 @@ typedef int bool;
 typedef struct timeval timeval_t;
 
 /* Function declarations */
-void print_help(proxy_config *);
-int read_config(proxy_config *);
+void print_help();
+int read_config();
 double getTime(void);
 
 

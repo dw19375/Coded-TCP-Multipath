@@ -42,6 +42,6 @@ typedef struct proxy_config {
     char var_type[MAX_CFG_VARS];
 } proxy_config;
 
-proxy_config getconfig();
+extern proxy_config config;
 
 #endif /* DEFAULT_CONFIG_H */

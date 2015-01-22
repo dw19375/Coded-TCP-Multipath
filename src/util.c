@@ -17,23 +17,23 @@
 #include "util.h"
 
 
-void print_help(proxy_config *proxy_cfg)
+void print_help()
 {
     printf("\n");
-    printf("USAGE:\n\t%s [OPTIONS] ACTION\n",proxy_cfg->program_name);
+    printf("USAGE:\n\t%s [OPTIONS] ACTION\n",config.program_name);
     printf("OPTIONS\n");
     printf("\t-h,      --help          display this help screen\n");
     printf("\t-v,      --version       display program version\n");
     printf("\t-c file, --config file   use configuration file 'file'\n");
-    printf("\t-f,      --forceload     force startup of %s\n",proxy_cfg->program_name);
+    printf("\t-f,      --forceload     force startup of %s\n",config.program_name);
     printf("\t                         PID file exists\n");
     printf("ACTIONS\n");
-    printf("\tstart                    start %s\n",proxy_cfg->program_name);
-    printf("\tshutdown                 shutdown %s\n",proxy_cfg->program_name);
+    printf("\tstart                    start %s\n",config.program_name);
+    printf("\tshutdown                 shutdown %s\n",config.program_name);
     printf("\n");
 }
 
-int read_config(proxy_config *proxy_cfg)
+int read_config()
 {
     char *line=NULL;
     size_t linecap=0;
@@ -43,8 +43,8 @@ int read_config(proxy_config *proxy_cfg)
     int i;
     
     FILE *f;
-    if ((f=fopen(proxy_cfg->config_file, "r"))==NULL) {
-        fprintf(stderr, "Could not open config file %s\n",proxy_cfg->config_file);
+    if ((f=fopen(config.config_file, "r"))==NULL) {
+        fprintf(stderr, "Could not open config file %s\n",config.config_file);
         return -1;
     }
     
@@ -54,29 +54,29 @@ int read_config(proxy_config *proxy_cfg)
                 continue;
             
             if (!sscanf(line, "%256s = %256s",var,val)) {
-                fprintf(stderr, "Could not parse config file %s\n",proxy_cfg->config_file);
+                fprintf(stderr, "Could not parse config file %s\n",config.config_file);
                 return -1;
             }
             
             if ((var[0] && !val[0]) || (!var[0] && val[0])) {
-                fprintf(stderr, "Could not parse config file %s\n",proxy_cfg->config_file);
+                fprintf(stderr, "Could not parse config file %s\n",config.config_file);
                 return -1;
             }
             
             if (!var[0] && !val[0])
                 continue;
             
-            for (i=0; i<proxy_cfg->num_vars; i++) {
-                if (!strcmp(var, proxy_cfg->var_name[i])) {
-                    switch (proxy_cfg->var_type[i]) {
+            for (i=0; i<config.num_vars; i++) {
+                if (!strcmp(var, config.var_name[i])) {
+                    switch (config.var_type[i]) {
                         case 's':
-                            strcpy((char*)(proxy_cfg->var_ptr[i]), val);
+                            strcpy((char*)(config.var_ptr[i]), val);
                             break;
                         case 'n':
-                            *(int*)proxy_cfg->var_ptr[i] = atoi(val);
+                            *(int*)config.var_ptr[i] = atoi(val);
                             break;
                         case 'f':
-                            *(double*)proxy_cfg->var_ptr[i] = atof(val);
+                            *(double*)config.var_ptr[i] = atof(val);
                             break;
                         default:
                             break;
