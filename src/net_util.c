@@ -47,6 +47,103 @@ ntohpData(Data_Pckt* msg)
   // Data is all in bytes, so don't need to do anything
 }
 
+/*
+ * pkt2iovec
+ * 
+ * Fills the elements of iov with appropriate data from pkt.
+ * 
+ * Parameters:
+ *    pkt   - Pointer to Data_Pckt to be read from
+ *    iov   - Pointer to start of struct iovec array to write to.
+ * 
+ * If pkt is NULL, null pointers are written into elements of iov 
+ * but the lengths are written into the elements of iov.
+ * 
+ * The array iov must contain as many elements as there are in
+ * the Data_Pckt struct.  However, if pkt->buf is NULL, iov may
+ * contain one fewer element.
+ * 
+ * Does not change byte order.
+ * 
+ * Returns number of elements written.
+ */
+int pkt2iovec( Data_Pckt *pkt, struct iovec *iov )
+{
+  int idx = 0;
+  
+  if( NULL != iov )
+  {
+    /*
+     * Write appropriate data lengths into iov
+     */
+    (iov[idx++]).iov_len = sizeof(pkt->tstamp);
+    (iov[idx++]).iov_len = sizeof(pkt->flag);
+    (iov[idx++]).iov_len = sizeof(pkt->seqno);
+    (iov[idx++]).iov_len = sizeof(pkt->payload_len);
+    (iov[idx++]).iov_len = sizeof(pkt->num_packets);
+    (iov[idx++]).iov_len = sizeof(pkt->coeff_seed);
+    
+    idx = 0;
+    
+    if( NULL != pkt )
+    {
+      (iov[idx++]).iov_base = &(pkt->tstamp);
+      (iov[idx++]).iov_base = &(pkt->flag);
+      (iov[idx++]).iov_base = &(pkt->seqno);
+      (iov[idx++]).iov_base = &(pkt->payload_len);
+      (iov[idx++]).iov_base = &(pkt->num_packets);
+      (iov[idx++]).iov_base = &(pkt->coeff_seed);
+      
+      if( NULL != pkt->buf )
+      {
+        (iov[idx]).iov_base = pkt->buf;
+        (iov[idx++]).iov_len = pkt->payload_len;
+      }
+    }
+  }
+  
+  return idx;
+}
+
+/*
+ * iovec2pkt
+ * 
+ * Reads an iovec into a Data_Pckt
+ * 
+ * Inputs:
+ *    pkt   - pointer to Data_Pckt to write into.
+ *    iov   - pointer to array of iovec to read from.
+ * 
+ * Returns number of elements read from iov
+ * 
+ * The array iov must contain as many elements as the struct 
+ * Data_Pckt has, however if payload_len is zero, iov may contain 
+ * one fewer element.
+ * 
+ * Does not change byte order.
+ */
+int iovec2pkt( Data_Pckt *pkt, struct iovec *iov )
+{
+  int idx = 0;
+  
+  if( NULL != pkt && NULL != iov )
+  {
+    pkt->tstamp = *((double*)(iov[idx++].iov_base));
+    pkt->flag = *((uint32_t*)(iov[idx++].iov_base));
+    pkt->seqno = *((uint32_t*)(iov[idx++].iov_base));
+    pkt->payload_len = *((uint32_t*)(iov[idx++].iov_base));
+    pkt->num_packets = *((uint16_t*)(iov[idx++].iov_base));
+    pkt->coeff_seed = *((uint16_t*)(iov[idx++].iov_base));
+    
+    if( pkt->payload_len > 0 )
+    {
+      pkt->buf = (char*)(iov[idx++].iov_base);
+    }
+  }
+  
+  return idx;
+}
+
 /* 
  * Old Code from Coded-TCP
  */

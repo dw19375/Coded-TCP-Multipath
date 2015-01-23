@@ -50,6 +50,7 @@ typedef struct
   uint32_t seqno;       // Normal packet - sequence number
                         // ACK - packet being acknowledged
                         // Coded - beginning of coding window
+  uint32_t payload_len; // Length of payload in bytes
   
   uint16_t num_packets; // Coded - Number of packets in coding window
                         // ACK - Number of dofs requested
@@ -68,6 +69,8 @@ typedef struct
 /* Function declarations */
 void htonpData(Data_Pckt *msg);
 void ntohpData(Data_Pckt *msg);
+int pkt2iovec( Data_Pckt *pkt, struct iovec *iov );
+int iovec2pkt( Data_Pckt *pkt, struct iovec *iov );
 //void prettyPrint(char** coeffs, int window);
 
 #endif
