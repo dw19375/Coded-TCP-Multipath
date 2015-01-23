@@ -33,6 +33,7 @@ proxy_config config = {
     .port_end=9999,
     .max_connections=25,
     .socks_neg_rto=5,
+    .max_backlog = 10,
     
     // Proxy Information
     .remote_addr="",
