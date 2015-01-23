@@ -67,6 +67,7 @@ typedef struct
 
 
 /* Function declarations */
+void create_tcp_socket(int*, char*, int);
 void htonpData(Data_Pckt *msg);
 void ntohpData(Data_Pckt *msg);
 int pkt2iovec( Data_Pckt *pkt, struct iovec *iov );

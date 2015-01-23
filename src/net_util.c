@@ -8,14 +8,58 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <sys/time.h>
 #include <assert.h>
 #include <math.h>
 #include "net_util.h"
 #include "util.h"
+
+void create_tcp_socket(int* sk, char* ip_addr, int port)
+{
+    struct addrinfo hints, *servinfo, *p;
+    ssize_t rv;
+    char port_str[5];
+    
+    sprintf(port_str, "%d",port);
+    
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    
+    if ((rv = getaddrinfo(ip_addr, port_str, &hints, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: Address: %s, Port: %d\n",config.local_ip,config.socks_port);
+        exit(EXIT_FAILURE);
+    }
+    
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+        if ((*sk = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+            perror("Failure to create TCP socket");
+            continue;
+        }
+        
+        if ((bind(*sk, p->ai_addr, p->ai_addrlen)) == -1) {
+            close(*sk);
+            perror("Failure to bind TCP socket");
+        }
+        break;
+    }
+    
+    if ((p = NULL)) {
+        fprintf(stderr, "Failed to bind: %s:%d\n",ip_addr,port);
+        close(*sk);
+        exit(EXIT_FAILURE);
+    }
+    
+    freeaddrinfo(servinfo);
+    return;
+}
+
 
 void
 htonpData(Data_Pckt* msg)
