@@ -1,8 +1,4 @@
 #include "mpctcp_proxy.h"
-#include "net_util.h"
-#include "util.h"
-#include "default_config.h"
-#include <string.h>
 
 int main(int argc, char *argv[])
 {
@@ -40,5 +36,19 @@ int main(int argc, char *argv[])
     if (read_config())
         exit(EXIT_FAILURE);
     
-	return 0;
+    if ((optind+1) > argc) {
+        fprintf(stderr, "No command given. Add either 'start' or 'stop'.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (!strcmp(argv[optind], "start")) {
+        start_proxy(force_load);
+    } else if (!strcmp(argv[optind], "stop")) {
+        stop_proxy();
+    } else {
+        fprintf(stderr, "Unknown command. Valid commands are 'start' or 'stop'");
+        exit(EXIT_FAILURE);
+    }
+    
+	exit(EXIT_SUCCESS);
 }

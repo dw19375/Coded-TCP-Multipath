@@ -9,10 +9,10 @@
 #ifndef DEFAULT_CONFIG_H
 #define DEFAULT_CONFIG_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+
+//#include <stdio.h>
+//#include <string.h>
+//#include <unistd.h>
 
 #define MAX_CFG_VARS 30
 
