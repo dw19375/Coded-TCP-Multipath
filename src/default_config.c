@@ -12,7 +12,11 @@ proxy_config config = {
     // Program Information
     .program_name="mpctcp",
     .version="0.0",
-    .date="16 Jan 2015",
+#ifdef __MACH__
+    .date="28 Jan 2015",
+#else
+    .date=__DATE__,
+#endif
     
     // File Names/Locations
 #ifdef __MACH__
@@ -22,8 +26,8 @@ proxy_config config = {
     .pidfile="~/.mpctcp/mpctcp.pid",
 #else
     .config_file="/etc/mpctcp/mpctcp.conf",
-    .logdir="/var/log/mpctcp",
-    .logfile="/var/log",
+    .logdir="/var/log",
+    .logfile="/var/log/mpctcp",
     .pidfile="/var/run/mpctcp.pid",
 #endif
     // SOCKS Information
