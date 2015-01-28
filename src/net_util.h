@@ -20,6 +20,10 @@ typedef int socket_t;
 #define NETIFDOWN	0
 #define NETIFUP		1
 
+#ifndef MSS
+#define MSS 1500
+#endif
+
 // We have to take into account the IP+UDP header
 // Max IP header is 24B, UDP header is 8B 
 #define IPUDP_HEADER_SIZE 32 
@@ -32,6 +36,7 @@ typedef int socket_t;
 #define   FIN 3
 #define   FIN_ACK 4
 #define   CODED 5
+#define   ACK 6
 
 
 struct addr_list

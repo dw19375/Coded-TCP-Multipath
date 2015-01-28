@@ -100,8 +100,9 @@ ntohpData(Data_Pckt* msg)
  *    pkt   - Pointer to Data_Pckt to be read from
  *    iov   - Pointer to start of struct iovec array to write to.
  * 
- * If pkt is NULL, null pointers are written into elements of iov 
- * but the lengths are written into the elements of iov.
+ * If pkt is NULL, nothing is written into elements of iov 
+ * except the lengths of the data to be filled in.  In essence,
+ * this writes a struct iovec for use with readv.
  * 
  * The array iov must contain as many elements as there are in
  * the Data_Pckt struct.  However, if pkt->buf is NULL, iov may
@@ -126,6 +127,11 @@ int pkt2iovec( Data_Pckt *pkt, struct iovec *iov )
     (iov[idx++]).iov_len = sizeof(pkt->payload_len);
     (iov[idx++]).iov_len = sizeof(pkt->num_packets);
     (iov[idx++]).iov_len = sizeof(pkt->coeff_seed);
+    
+    // If generating an empty iovec for reading, fill payload
+    // length with large number - it may not all be used.
+#warning Using statically defined MSS
+    (iov[idx++]).iov_len = MSS;
     
     idx = 0;
     
