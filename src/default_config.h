@@ -37,6 +37,7 @@ typedef struct proxy_config {
     char cong_control[16];
     int debug;
     int mpctcp_probe;
+    int fork;
     int num_vars;
     void* var_name[MAX_CFG_VARS];
     void* var_ptr[MAX_CFG_VARS];

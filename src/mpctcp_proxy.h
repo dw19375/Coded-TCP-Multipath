@@ -15,7 +15,7 @@
 #include "net_util.h"
 
 typedef struct proxy_connections {
-    int listen_sk;
+    //int listen_sk;
     int client_sk;
     struct sockaddr_storage client_addr;
 } proxy_connections;

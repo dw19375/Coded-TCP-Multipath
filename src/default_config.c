@@ -50,15 +50,17 @@ proxy_config config = {
     // Debug Settings
     .debug=1,
     .mpctcp_probe=0,
+    .fork=1,
     
     // Configuration File Variables
-    .num_vars = 15,
+    .num_vars = 16,
     .var_name = {
         "LOG_DIR", "LOG_FILE", "PID_FILE",
         "BIND_ADDR", "SOCKS_PORT", "START_PORT",
         "END_PORT", "MAX_CONNECTIONS", "SOCKS_NEGOTIATION_RTO",
         "REMOTE_ADDR", "REMOTE_PORT", "SLR_SCALING",
-        "CONGESTION_CONTROL","DEBUG","MPCTCP_PROBE"
+        "CONGESTION_CONTROL","DEBUG","MPCTCP_PROBE",
+        "FORK"
     },
     
     .var_ptr = {
@@ -66,7 +68,8 @@ proxy_config config = {
         &(config.local_ip), &(config.socks_port), &(config.port_start),
         &(config.port_end), &(config.max_connections), &(config.socks_neg_rto),
         &(config.remote_addr), &(config.remote_port), &(config.slr_scaling),
-        &(config.cong_control), &(config.debug), &(config.mpctcp_probe)
+        &(config.cong_control), &(config.debug), &(config.mpctcp_probe),
+        &(config.fork)
     },
     
     .var_type = {
@@ -74,7 +77,8 @@ proxy_config config = {
         's', 'n', 'n',
         'n', 'n', 'n',
         's', 'n', 'f',
-        's', 'n', 'n'
+        's', 'n', 'n',
+        'n'
     }
  
 };

@@ -56,11 +56,13 @@ void start_proxy(int force_load)
 {
     
     FILE* pidfile;
-    pid_t pid;
+    pid_t pid, pid_con;
     struct sigaction sa;
     proxy_connections proxy_conn;
     int listen_sk;
     socklen_t sin_size;
+    int conn_cnt;
+    int res;
     
     printf("Starting %s ...",config.program_name);
     fflush(stdout);
@@ -70,19 +72,21 @@ void start_proxy(int force_load)
         fprintf(stderr, "ERROR\n \tPID file %s could not be opened (maybe %s is not running).\n",config.pidfile,config.program_name);
         exit(EXIT_FAILURE);
     }
-    /*
-    pid = fork();
-    switch (pid) {
-        case 0:
-            // Child Process
-            setsid();
-            break;
-        case -1:
-            // Fork Failed
-            fprintf(stderr, "ERROR\n \tfork() failed - cannont detach daemon\n");
-            exit(EXIT_FAILURE);
-        default:
-            exit(EXIT_SUCCESS);
+    
+    if (config.fork == 1) {
+        pid = fork();
+        switch (pid) {
+            case 0:
+                // Child Process
+                setsid();
+                break;
+            case -1:
+                // Fork Failed
+                fprintf(stderr, "ERROR\n \tfork() failed - cannont detach daemon\n");
+                exit(EXIT_FAILURE);
+            default:
+                exit(EXIT_SUCCESS);
+        }
     }
     
     sa.sa_handler = handle_sig;
@@ -92,11 +96,10 @@ void start_proxy(int force_load)
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGCHLD, &sa, NULL);
     //sigaction(SIGALRM, &sa, NULL);
-    */
     
-    create_tcp_socket(&(proxy_conn.listen_sk), config.local_ip, config.socks_port);
+    create_tcp_socket(&(listen_sk), config.local_ip, config.socks_port);
 
-    if (listen(proxy_conn.listen_sk,config.max_backlog) == -1) {
+    if (listen(listen_sk,config.max_backlog) == -1) {
         perror("listen");
         fprintf(stderr, "Failed to setup listen on %s:%d\n",config.local_ip,config.socks_port);
         exit(EXIT_FAILURE);
@@ -105,7 +108,38 @@ void start_proxy(int force_load)
     printf("OK\n");
     fflush(stdout);
     
-    //proxy_conn.client_sk = accept(proxy_conn.listen_sk, (struct sockaddr *)&(proxy_conn.client_addr), &sin_size);
+    while (1) {
+        if (conn_cnt >= config.max_connections) {
+            sleep(1);
+            continue;
+        }
+        
+        if ((proxy_conn.client_sk = accept(listen_sk, (struct sockaddr *)&(proxy_conn.client_addr), &sin_size)) == -1) {
+            perror("accept");
+            fprintf(stderr, "Failed to accept new connection\n");
+            continue;
+        }
+            
+        pid_con = fork();
+        switch (pid_con) {
+            case -1:
+                fprintf(stderr, "ERROR\n \tfork() failed - cannot create child\n");
+                close(proxy_conn.client_sk);
+                break;
+            case 1:
+                if (++conn_cnt >= config.max_connections) {
+                    fprintf(stderr, "Maximum daemon load reached: %d active connections\n",conn_cnt);
+                }
+                close(proxy_conn.client_sk);
+                break;
+            default:
+                close(listen_sk);
+                res = handle_con(&proxy_conn);
+                close(proxy_conn.client_sk);
+                exit(res);
+                break;
+        }
+    }
 }
 
 void stop_proxy()

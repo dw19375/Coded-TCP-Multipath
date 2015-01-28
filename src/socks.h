@@ -7,6 +7,8 @@
 
 #include <signal.h>
 #include "default_config.h"
+#include "mpctcp_proxy.h"
 
+void handle_con(proxy_connections *);
 
 #endif
