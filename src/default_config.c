@@ -12,11 +12,7 @@ proxy_config config = {
     // Program Information
     .program_name="mpctcp",
     .version="0.0",
-#ifdef __MACH__
     .date=__DATE__,
-#else
-    .date=__DATE__,
-#endif
     
     // File Names/Locations
 #ifdef __MACH__
