@@ -60,6 +60,62 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
     return;
 }
 
+/*
+ * Creates a new, empty packet in dynamic memory.  The
+ * packet and the payload buffer are seperate malloc's.
+ * 
+ * NOTE: This uses malloc, so please call free somewhere on 
+ * the Data_Pckt allocated and the payload buffer (buf).  buf is
+ * not allocated if buflen is zero.
+ * 
+ * Inputs:
+ *  buflen - Length of payload buffer to allocate in bytes.  If 
+ *           buflen <= 0, then Data_Pckt->buf is NOT allocated.
+ * 
+ * Returns a new Data_Pckt which is empty except for buf.
+ */
+Data_Pckt* create_pkt( int buflen )
+{
+  Data_Pckt* ret = NULL;
+  
+  ret = (Data_Pckt*)malloc(sizeof(Data_Pckt));
+  
+  if( NULL != ret )
+  {
+    if( buflen > 0 )
+    {
+      ret->buf = (char*)malloc( buflen );
+    }
+    else
+    {
+      ret->buf = NULL;
+    }
+  }
+  
+  return ret;
+}
+
+/*
+ * Frees all memory associated with a packet.
+ * 
+ * Input:
+ *  pkt - Data_Pckt to free.
+ */
+void delete_pkt( Data_Pckt* pkt )
+{
+  if( NULL != pkt )
+  {
+    // Free payload buffer first.
+    if( NULL != pkt->buf )
+    {
+      free( pkt->buf );
+    }
+    
+    // Free packet
+    free( pkt );
+  }
+}
+
 
 void
 htonpData(Data_Pckt* msg)
