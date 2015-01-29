@@ -1,5 +1,8 @@
 Discussion
 
+4. Jason, if you want to use the Data_Pckt struct, create and destroy them with create_pkt and delete_pkt in net_util.c, just 
+   so we don't have any memory leaks.
+
 3. Dan, before you insert code, please make sure that it compiles.  I have to comment out a lot of stuff in the net_util files in order to get things to work.  In addition, it looks like you may have to rewrite a lot of those functions.  For example, some of them reference “block_size” which we aren’t going to use.
 
 Jason, sorry about that.  I fixed all the errors.
