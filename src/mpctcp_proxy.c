@@ -61,7 +61,7 @@ void start_proxy(int force_load)
     proxy_connections proxy_conn;
     int listen_sk;
     socklen_t sin_size;
-    int conn_cnt;
+    int conn_cnt = 0;
     int res;
     
     printf("Starting %s ...",config.program_name);
