@@ -13,7 +13,7 @@ proxy_config config = {
     .program_name="mpctcp",
     .version="0.0",
 #ifdef __MACH__
-    .date="28 Jan 2015",
+    .date="29 Jan 2015",
 #else
     .date=__DATE__,
 #endif
