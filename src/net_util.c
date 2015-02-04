@@ -75,9 +75,10 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
  * 
  * Inputs:
  *  buflen - Length of payload buffer to allocate in bytes.  If 
- *           buflen <= 0, then Data_Pckt->buf is NOT allocated.
+ *           buflen == 0, then Data_Pckt->buf is NULL.
  * 
- * Returns a new Data_Pckt which is empty except for buf.
+ * Returns a new Data_Pckt which is empty except for buf, which
+ * points to the payload buffer.
  */
 Data_Pckt* create_pkt( unsigned int buflen )
 {
