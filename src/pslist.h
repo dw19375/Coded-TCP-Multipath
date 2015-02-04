@@ -19,19 +19,20 @@
 
 typedef struct pslist_elem
 {
-  Data_Pckt* pkt;
   struct pslist_elem* next;
   struct pslist_elem* prev;
+  Data_Pckt pkt;
 } pslist_elem;
 
 
 /*
  * Function Declarations
  */
-
-pslist_elem* ins_pslist_elem( pslist_elem** head, Data_Pckt* pkt );
+pslist_elem* create_pslist_elem( unsigned int buflen );
+void delete_list_elem( pslist_elem* elem );
+pslist_elem* ins_pslist_elem( pslist_elem** head, pslist_elem* elem );
 Data_Pckt* peek_pslist( pslist_elem* head );
-int rm_pslist_elem( pslist_elem* elem );
+int rm_pslist_elem( pslist_elem** head, pslist_elem* elem );
 int chop_pslist( pslist_elem** head, uint32_t seqno );
 
 #endif /* P_QUEUE_H */
