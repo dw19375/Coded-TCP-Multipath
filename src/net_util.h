@@ -75,7 +75,7 @@ typedef struct
 void create_tcp_socket(int*, char*, int);
 void htonpData(Data_Pckt *msg);
 void ntohpData(Data_Pckt *msg);
-Data_Pckt* create_pkt( unsigned int buflen );
+Data_Pckt* create_pkt( uint32_t buflen );
 void delete_pkt( Data_Pckt* pkt );
 int pkt2iovec( Data_Pckt *pkt, struct iovec *iov );
 int iovec2pkt( Data_Pckt *pkt, struct iovec *iov );

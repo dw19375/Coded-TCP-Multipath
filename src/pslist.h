@@ -28,7 +28,7 @@ typedef struct pslist_elem
 /*
  * Function Declarations
  */
-pslist_elem* create_pslist_elem( unsigned int buflen );
+pslist_elem* create_pslist_elem( uint32_t buflen );
 void delete_list_elem( pslist_elem* elem );
 pslist_elem* ins_pslist_elem( pslist_elem** head, pslist_elem* elem );
 Data_Pckt* peek_pslist( pslist_elem* head );

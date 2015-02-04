@@ -29,7 +29,7 @@
  * 
  * Returns a pointer to the pslist_elem created.
  */
-pslist_elem* create_pslist_elem( unsigned int buflen )
+pslist_elem* create_pslist_elem( uint32_t buflen )
 {
   pslist_elem* ret = NULL;
   
@@ -37,6 +37,9 @@ pslist_elem* create_pslist_elem( unsigned int buflen )
   
   if( NULL != ret )
   {
+    // Add payload length to Data_Pckt struct.
+    ret->pkt.payload_len = buflen;
+    
     if( buflen > 0 )
     {
       ret->pkt.buf = ((char*)ret) + sizeof(pslist_elem);

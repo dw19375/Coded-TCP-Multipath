@@ -80,7 +80,7 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
  * Returns a new Data_Pckt which is empty except for buf, which
  * points to the payload buffer.
  */
-Data_Pckt* create_pkt( unsigned int buflen )
+Data_Pckt* create_pkt( uint32_t buflen )
 {
   Data_Pckt* ret = NULL;
   
@@ -88,6 +88,8 @@ Data_Pckt* create_pkt( unsigned int buflen )
   
   if( NULL != ret )
   {
+    ret->payload_len = buflen;
+    
     if( buflen > 0 )
     {
       ret->buf = ((char*)ret) + sizeof(Data_Pckt);
