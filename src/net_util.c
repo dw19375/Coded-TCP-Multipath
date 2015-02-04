@@ -61,12 +61,17 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
 }
 
 /*
- * Creates a new, empty packet in dynamic memory.  The
- * packet and the payload buffer are seperate malloc's.
+ * Creates a new, empty packet in dynamic memory.  The packet
+ * and payload are malloc'ed together with pkt->buf pointing
+ * to the memory address right after it.
  * 
- * NOTE: This uses malloc, so please call free somewhere on 
- * the Data_Pckt allocated and the payload buffer (buf).  buf is
- * not allocated if buflen is zero.
+ * NOTE: This uses malloc, so please call delete_pkt somewhere on 
+ * the Data_Pckt allocated.
+ * 
+ * NOTE: If you intend to use this packet in a pslist, then 
+ * use the create_pslist_elem function instead, which allocates
+ * all the memory for the packet, buffer, and list structs all
+ * at once.
  * 
  * Inputs:
  *  buflen - Length of payload buffer to allocate in bytes.  If 
@@ -74,17 +79,17 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
  * 
  * Returns a new Data_Pckt which is empty except for buf.
  */
-Data_Pckt* create_pkt( int buflen )
+Data_Pckt* create_pkt( unsigned int buflen )
 {
   Data_Pckt* ret = NULL;
   
-  ret = (Data_Pckt*)malloc(sizeof(Data_Pckt));
+  ret = (Data_Pckt*)malloc(sizeof(Data_Pckt) + buflen);
   
   if( NULL != ret )
   {
     if( buflen > 0 )
     {
-      ret->buf = (char*)malloc( buflen );
+      ret->buf = ((char*)ret) + sizeof(Data_Pckt);
     }
     else
     {
@@ -105,13 +110,6 @@ void delete_pkt( Data_Pckt* pkt )
 {
   if( NULL != pkt )
   {
-    // Free payload buffer first.
-    if( NULL != pkt->buf )
-    {
-      free( pkt->buf );
-    }
-    
-    // Free packet
     free( pkt );
   }
 }
