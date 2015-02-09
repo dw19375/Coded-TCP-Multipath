@@ -31,6 +31,7 @@ typedef struct proxy_config {
     int max_connections;
     int socks_neg_rto;
     int max_backlog;
+    int max_pktbuf_size;
     char remote_addr[256];
     int remote_port;
     double slr_scaling;

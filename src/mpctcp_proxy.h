@@ -9,11 +9,18 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <poll.h>
 #include "util.h"
 #include "default_config.h"
 #include "socks.h"
 #include "net_util.h"
 
+typedef struct proxy_connections {
+    int local_tcp_sk;
+    int local_udp_sk;
+    int client_sk;
+    struct sockaddr_storage client_addr;
+} proxy_connections;
 
 void start_proxy(int);
 void stop_proxy();

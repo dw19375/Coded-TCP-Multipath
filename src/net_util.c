@@ -50,8 +50,48 @@ void create_tcp_socket(int* sk, char* ip_addr, int port)
         break;
     }
     
-    if ((p = NULL)) {
-        fprintf(stderr, "Failed to bind: %s:%d\n",ip_addr,port);
+    if (p == NULL) {
+        fprintf(stderr, "Failed to bind tcp socket on %s:%d\n",ip_addr,port);
+        close(*sk);
+        exit(EXIT_FAILURE);
+    }
+    
+    freeaddrinfo(servinfo);
+    return;
+}
+
+void create_udp_socket(int* sk, char* ip_addr, int port)
+{
+    struct addrinfo hints, *servinfo, *p;
+    ssize_t rv;
+    char port_str[5];
+    
+    sprintf(port_str, "%d",port);
+    
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    
+    if ((rv = getaddrinfo(ip_addr, port_str, &hints, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: Address: %s, Port %d\n",config.local_ip,config.socks_port);
+        exit(EXIT_FAILURE);
+    }
+    
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+        if ((*sk = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+            perror("Failure to create UDP socket");
+            continue;
+        }
+        
+        if ((bind(*sk, p->ai_addr, p->ai_addrlen)) == -1) {
+            close(*sk);
+            perror("Failure to bind UDP socket");
+        }
+        break;
+    }
+    
+    if (p == NULL) {
+        fprintf(stderr, "Failed to bind UDP socket on %s:%d\n",ip_addr,port);
         close(*sk);
         exit(EXIT_FAILURE);
     }

@@ -59,10 +59,12 @@ void start_proxy(int force_load)
     pid_t pid, pid_con;
     struct sigaction sa;
     proxy_connections proxy_conn;
-    int listen_sk;
+    struct pollfd fds[2];
     socklen_t sin_size;
     int conn_cnt = 0;
     int res;
+    ssize_t rv;
+    int accept_conn;
     
     printf("Starting %s ...",config.program_name);
     fflush(stdout);
@@ -96,17 +98,27 @@ void start_proxy(int force_load)
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGCHLD, &sa, NULL);
     //sigaction(SIGALRM, &sa, NULL);
-    
-    create_tcp_socket(&(listen_sk), config.local_ip, config.socks_port);
 
-    if (listen(listen_sk,config.max_backlog) == -1) {
+    create_udp_socket(&(proxy_conn.local_udp_sk), config.local_ip, config.socks_port);
+    create_tcp_socket(&(proxy_conn.local_tcp_sk), config.local_ip, config.socks_port);
+
+    if (listen(proxy_conn.local_tcp_sk,config.max_backlog) == -1) {
         perror("listen");
         fprintf(stderr, "Failed to setup listen on %s:%d\n",config.local_ip,config.socks_port);
         exit(EXIT_FAILURE);
     }
     
+    memset(fds, 0, 2*sizeof(struct pollfd));
+    fds[0].fd = proxy_conn.local_tcp_sk;
+    fds[0].events |= POLLIN;
+    fds[1].fd = proxy_conn.local_udp_sk;
+    fds[1].events |= POLLIN;
+    
     printf("OK\n");
     fflush(stdout);
+    
+    char buf[config.max_pktbuf_size];
+    socklen_t udpaddrlen;
     
     while (1) {
         if (conn_cnt >= config.max_connections) {
@@ -114,12 +126,36 @@ void start_proxy(int force_load)
             continue;
         }
         
-        if ((proxy_conn.client_sk = accept(listen_sk, (struct sockaddr *)&(proxy_conn.client_addr), &sin_size)) == -1) {
-            perror("accept");
-            fprintf(stderr, "Failed to accept new connection\n");
-            continue;
-        }
+        accept_conn = FALSE;
+        while (accept_conn == FALSE) {
+            res = poll(fds, 2, -1);
             
+            if (res == -1) {
+                fprintf(stderr, "ERROR\n \t poll() failed\n");
+                perror("poll");
+            } else {
+                if (fds[0].revents & POLLIN) {
+                    if((proxy_conn.client_sk = accept(proxy_conn.local_tcp_sk, (struct sockaddr *)&(proxy_conn.client_addr), &sin_size)) == -1) {
+                        fprintf(stderr, "Failed to accept new TCP connection\n");
+                        perror("accept");
+                        continue;
+                    }
+                    accept_conn = TRUE;
+                }
+                
+                if (fds[1].revents & POLLIN) {
+                    if ((rv = recvfrom(proxy_conn.local_udp_sk, buf, (size_t)config.max_pktbuf_size, 0, (struct sockaddr *)&(proxy_conn.client_addr), &udpaddrlen)) == -1) {
+                        fprintf(stderr, "Failed to accept new UDP connection\n");
+                        perror("recvfrom");
+                        continue;
+                    }
+                    accept_conn = TRUE;
+                }
+            }
+        }
+        
+        
+        //TODO:
         pid_con = fork();
         switch (pid_con) {
             case -1:
@@ -133,8 +169,8 @@ void start_proxy(int force_load)
                 close(proxy_conn.client_sk);
                 break;
             default:
-                close(listen_sk);
-                res = handle_con(&proxy_conn);
+                close(proxy_conn.local_tcp_sk);
+                //res = handle_con(&proxy_conn);
                 close(proxy_conn.client_sk);
                 exit(res);
                 break;

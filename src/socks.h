@@ -9,13 +9,9 @@
 #include "default_config.h"
 #include "mpctcp_proxy.h"
 
-typedef struct proxy_connections {
-  //int listen_sk;
-  int client_sk;
-  struct sockaddr_storage client_addr;
-} proxy_connections;
 
 
-int handle_con(proxy_connections *);
+
+int handle_con();
 
 #endif
